@@ -7,7 +7,8 @@ class NeuralNetPlayer:
         self.paddle = Paddle(x, y, 50, 10, surface)
         self.ball = ball
         self.score = 0
-        self.network = NeuralNetwork(1, [3, 2])
+        self.network = NeuralNetwork(1, [3, 3, 2])
+        self.last_output = []
 
     def play(self, debug):
         target_x = self.ball.x
@@ -25,5 +26,8 @@ class NeuralNetPlayer:
 
         self.paddle.move(movement)
 
-        if (debug == True):
-            print(outputs)
+        if debug == True:
+            if self.last_output != outputs:
+                if self.paddle.rect.x < 100: print("      ", end="")
+                print(outputs)
+            self.last_output = outputs
