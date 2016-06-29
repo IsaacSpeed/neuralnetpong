@@ -1,5 +1,5 @@
 import pygame
-from pygame import Rect, Color
+from pygame import Rect
 
 
 # A paddle class

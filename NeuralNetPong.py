@@ -1,8 +1,8 @@
 import pygame
 from pygame.locals import *
-from Paddle import Paddle
 from Ball import Ball
 from DumbComputerPlayer import DumbComputerPlayer
+from NeuralNetPlayer import NeuralNetPlayer
 
 
 def main():
@@ -18,8 +18,8 @@ def main():
     pygame.display.flip()
 
     ball = Ball(-0.25, -0.25, 5, main_surface)
-    top_player = DumbComputerPlayer(150, 10, ball, main_surface)
-    bottom_player = DumbComputerPlayer(150, 450, ball, main_surface)
+    top_player = NeuralNetPlayer(150, 10, ball, main_surface)
+    bottom_player = NeuralNetPlayer(150, 450, ball, main_surface)
 
     speed_multiplier = 1
 
@@ -37,8 +37,8 @@ def main():
             bottom_player.score += 1
             ball.respawn(ball.vx * speed_multiplier, ball.vy * speed_multiplier * -1)
 
-        top_player.play()
-        # bottom_player.play()
+        top_player.play(True)
+        bottom_player.play(False)
         screen.blit(main_surface, (0, 0))
         pygame.display.flip()
 
