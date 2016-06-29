@@ -25,6 +25,7 @@ class NeuralNetPlayer:
                 movement = 1
 
         self.paddle.move(movement)
+        self.network.mutate()
 
         if debug == True:
             if self.last_output != outputs:
