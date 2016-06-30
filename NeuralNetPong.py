@@ -7,6 +7,7 @@ from GeneticAlgorithm import GeneticAlgorithm
 from Paddle import Paddle
 import math
 import time
+import random
 
 
 def main():
@@ -34,7 +35,7 @@ def main():
             surface = pygame.Surface((main_surface.get_width() // max_index, main_surface.get_height() // max_index))
             pygame.draw.rect(surface, (150, 150, 150), Rect(0, 0, surface.get_width(), surface.get_height()), 1)
 
-            ball = Ball(0.25, 0.25, 5, surface)
+            ball = Ball(random.random() / 2, random.random() / 2, 5, surface)
             top_player = DumbComputerPlayer(surface.get_width() // 2, 5, ball, surface)
 
             player_index = i * max_index + j
@@ -79,17 +80,20 @@ def main():
                     ball = balls[i][j]
                     ball.undraw()
 
-                    ball.respawn(ball.vx, ball.vy)
+                    ball.respawn(random.random() / 2, random.random() / 2)
                     top_player = DumbComputerPlayer(surface.get_width() // 2, 5, ball, surface)
 
                     player_index = i * max_index + j
                     bottom_player = genetic_algorithm.population[player_index]
                     bottom_player.ball = ball
-                    bottom_player.paddle = Paddle(surface.get_width() // 2, surface.get_height() - 15,
+                    bottom_player.paddle = Paddle(random.randint(0, surface.get_width()), surface.get_height() - 15,
                                                   math.floor(surface.get_width() * 0.2),
                                                   math.floor(surface.get_height() * 0.05), surface)
                     bottom_player.x = surface.get_width() // 2
                     bottom_player.y = surface.get_height() // 2
+
+                    bottom_player.score = 0
+                    top_player.score = 0
 
                     array_of_players.append([top_player, bottom_player])
                 players[i] = array_of_players

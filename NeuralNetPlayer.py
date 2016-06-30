@@ -12,7 +12,7 @@ class NeuralNetPlayer:
             self.paddle = None
         self.ball = ball
         self.score = 0
-        self.fitness_score = 0
+        self.fitness_score = 1
         self.network = NeuralNetwork(1, [3, 3, 2])
         self.last_output = []
 

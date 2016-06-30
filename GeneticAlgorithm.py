@@ -21,19 +21,30 @@ class GeneticAlgorithm:
         if self.generation_counter >= self.number_of_generations:
             return False
 
-        first_individual = self.roulette()
-        second_individual = self.roulette()
+        for i in range(0, len(self.population)):
+            print("Player {:} {:} has a score of {:}".format(i, self.population[i], self.population[i].get_fitness_score()))
+        print()
 
-        mutation_chance = random.random()
-        crossover_chance = random.random()
+        new_population = []
 
-        if crossover_chance <= self.chance_of_crossover:
-            child = NeuralNetPlayer.crossover(first_individual, second_individual)
-        else:
-            child = NeuralNetPlayer.from_other(first_individual)
+        while len(new_population) < self.number_of_population:
+            first_individual = self.roulette()
+            second_individual = self.roulette()
 
-        if mutation_chance <= self.chance_of_mutation:
-            child.mutate()
+            mutation_chance = random.random()
+            crossover_chance = random.random()
+
+            if crossover_chance <= self.chance_of_crossover:
+                child = NeuralNetPlayer.crossover(first_individual, second_individual)
+            else:
+                child = NeuralNetPlayer.from_other(first_individual)
+
+            if mutation_chance <= self.chance_of_mutation:
+                child.mutate()
+
+            new_population.append(child)
+
+        self.population = new_population
 
         self.generation_counter += 1
         return True
@@ -46,4 +57,6 @@ class GeneticAlgorithm:
 
         index = random.randint(0, len(weighted_array) - 1)
 
-        return self.population[weighted_array[index]]
+        individual_index = weighted_array[index]
+
+        return self.population[individual_index]
