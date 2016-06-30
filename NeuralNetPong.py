@@ -3,14 +3,18 @@ from pygame.locals import *
 from Ball import Ball
 from DumbComputerPlayer import DumbComputerPlayer
 from NeuralNetPlayer import NeuralNetPlayer
+from GeneticAlgorithm import GeneticAlgorithm
+from Paddle import Paddle
+import math
 
 
 def main():
-    sqrt_number_of_screens = 5
     speed_multiplier = 1.0
     screens = []
     players = []
     balls = []
+
+    genetic_algorithm = GeneticAlgorithm(50, 16)
 
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
@@ -20,18 +24,26 @@ def main():
     main_surface = main_surface.convert()
     main_surface.fill((0, 0, 0))
 
-    for i in range(0, sqrt_number_of_screens):
+    max_index = math.floor(math.sqrt(len(genetic_algorithm.population)))
+    for i in range(0, max_index):
         array_of_screens = []
         array_of_players = []
         array_of_balls = []
-        for j in range(0, sqrt_number_of_screens):
-            surface = pygame.Surface((main_surface.get_width() // sqrt_number_of_screens, main_surface.get_height()
-                                      // sqrt_number_of_screens))
+        for j in range(0, max_index):
+            surface = pygame.Surface((main_surface.get_width() // max_index, main_surface.get_height() // max_index))
             pygame.draw.rect(surface, (150, 150, 150), Rect(0, 0, surface.get_width(), surface.get_height()), 1)
 
             ball = Ball(0.25, 0.25, 5, surface)
-            top_player = NeuralNetPlayer(surface.get_width() // 2, 15, ball, surface)
-            bottom_player = NeuralNetPlayer(surface.get_width() // 2, surface.get_height() - 15, ball, surface)
+            top_player = DumbComputerPlayer(surface.get_width() // 2, 5, ball, surface)
+
+            player_index = i * max_index + j
+            bottom_player = genetic_algorithm.population[player_index]
+            bottom_player.ball = ball
+            bottom_player.paddle = Paddle(surface.get_width() // 2, surface.get_height() - 15,
+                                          math.floor(surface.get_width() * 0.2),
+                                          math.floor(surface.get_height() * 0.05), surface)
+            bottom_player.x = surface.get_width() // 2
+            bottom_player.y = surface.get_height() // 2
 
             array_of_screens.append(surface)
             array_of_balls.append(ball)
@@ -48,14 +60,14 @@ def main():
             if event.type == QUIT:
                 return
 
-        for i in range(0, sqrt_number_of_screens):
-            for j in range(0, sqrt_number_of_screens):
+        for i in range(0, max_index):
+            for j in range(0, max_index):
                 surface = screens[i][j]
                 ball = balls[i][j]
                 top_player = players[i][j][0]
                 bottom_player = players[i][j][1]
 
-                ball.move([bottom_player.paddle, top_player.paddle])
+                ball.move([bottom_player, top_player])
 
                 if ball.is_past_bottom_of_screen():
                     top_player.score += 1
@@ -64,7 +76,7 @@ def main():
                     bottom_player.score += 1
                     ball.respawn(ball.vx * speed_multiplier, ball.vy * speed_multiplier * -1)
 
-                top_player.play(False)
+                top_player.play()
                 bottom_player.play(False)
 
                 main_surface.blit(surface, (surface.get_width() * j, surface.get_height() * i))

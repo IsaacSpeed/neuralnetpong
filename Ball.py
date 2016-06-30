@@ -17,8 +17,9 @@ class Ball:
         self.y_accumulator = 0
 
     def check_collision(self, other):
-        if other.rect.left - self.radius < self.x < other.rect.right + self.radius and\
-                other.rect.top - self.radius < self.y + self.vy < other.rect.bottom + self.radius:
+        if other.paddle.rect.left - self.radius < self.x < other.paddle.rect.right + self.radius and\
+                other.paddle.rect.top - self.radius < self.y + self.vy < other.paddle.rect.bottom + self.radius:
+            other.collide()
             return True
         else:
             return False
@@ -46,11 +47,11 @@ class Ball:
         elif self.vx < -1 * Ball.max_velocity:
             self.vx = -1 * Ball.max_velocity
 
-    def move(self, paddles):
+    def move(self, players):
         self.undraw()
 
-        for paddle in paddles:
-            if self.check_collision(paddle):
+        for player in players:
+            if self.check_collision(player):
                 self.vy *= -1
                 self.y_accumulator *= -1
 

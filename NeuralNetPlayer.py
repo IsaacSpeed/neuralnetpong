@@ -7,8 +7,23 @@ class NeuralNetPlayer:
         self.paddle = Paddle(x, y, 50, 10, surface)
         self.ball = ball
         self.score = 0
+        self.fitness_score = 0
         self.network = NeuralNetwork(1, [3, 3, 2])
         self.last_output = []
+
+    def __init__(self):
+        self.ball = None
+        self.paddle = None
+        self.fitness_score = 0
+        self.score = 0
+        self.network = NeuralNetwork(1, [3, 3, 2])
+        self.last_output = []
+
+    def collide(self):
+        self.fitness_score += 10
+
+    def get_fitness_score(self):
+        return self.fitness_score + self.score * 50
 
     def play(self, debug):
         target_x = self.ball.x
