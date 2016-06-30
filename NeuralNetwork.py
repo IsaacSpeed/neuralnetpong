@@ -1,4 +1,5 @@
 import random
+import copy
 
 
 class NeuralNetwork:
@@ -8,6 +9,7 @@ class NeuralNetwork:
     def __init__(self, number_of_inputs, neuron_layers):
         """ neuron_layers is an array, one int for each layer, and the int represents how many neurons in that layer"""
         self.hidden_layers = []
+        self.neuron_layers = neuron_layers
         self.number_of_inputs = number_of_inputs
         self.inputs = []
         for i in range(0, len(neuron_layers)):
@@ -32,11 +34,26 @@ class NeuralNetwork:
                     layer.append(Neuron(self.hidden_layers[i-1], len(self.hidden_layers[i-1]), weights, threshold))
             self.hidden_layers.append(layer)
 
+    # this is inefficient
     @classmethod
-    def from_other_network(self, base_network):
-        self.number_of_inputs = base_network.number_of_inputs
-        self.inputs = []
-        self.hidden_layers = copy.deepcopy(base_network.hidden_layers)
+    def from_other_network(cls, base_network):
+        network = cls(base_network.number_of_inputs, base_network.neuron_layers)
+        network.inputs = []
+        network.hidden_layers = copy.deepcopy(base_network.hidden_layers)
+        return network
+
+    @classmethod
+    def crossover(cls, first_network, second_network):
+        child = cls.from_other_network(first_network)
+
+        layer_index = random.randint(0, len(child.hidden_layers) - 1)
+        neuron_index = random.randint(0, len(child.hidden_layers[layer_index]) - 1)
+
+        for i in range(layer_index, len(child.hidden_layers)):
+            for j in range(neuron_index, len(child.hidden_layers[i])):
+                child.hidden_layers[i][j] = copy.deepcopy(second_network.hidden_layers[i][j])
+            neuron_index = 0
+        return child
 
     def feed_forward(self, inputs):
         del self.inputs[:]
@@ -49,17 +66,6 @@ class NeuralNetwork:
             outputs.append(neuron.get_output())
 
         return outputs
-
-    def crossover(self, first_network, second_network):
-        child = NeuralNetwork(first_network)
-
-        layer_index = random.randint(0, len(child.hidden_layers) - 1)
-        neuron_index = random.randint(0, len(child.hidden_layers[layer_index]) - 1)
-
-        for i in range(layer_index, len(child.hidden_layers)):
-            for j in range(neuron_index, len(child.hidden_layers[i])):
-                child.hidden_layers[i][j] = copy.deepcopy(second_network.hidden_layers[i][j])
-            neuron_index = 0
 
     def mutate(self):
         for layer in self.hidden_layers:
