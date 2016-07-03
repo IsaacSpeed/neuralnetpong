@@ -86,13 +86,6 @@ class NeuralNetwork:
                 if chance <= self.chance_of_mutation:
                     neuron.mutate()
 
-    def print_network_debug(self):
-        print("Inputs:")
-        for an_input in self.inputs:
-            print(an_input.get_output())
-
-        self.hidden_layers[0][0].print_neuron()
-
     def print_network(self):
         print("Inputs: ")
         for an_input in self.inputs:

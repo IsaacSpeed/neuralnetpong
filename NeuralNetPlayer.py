@@ -13,8 +13,7 @@ class NeuralNetPlayer:
         self.ball = ball
         self.score = 0
         self.fitness_score = 1
-        self.network = NeuralNetwork(1, [16, 1])
-        self.last_output = []
+        self.network = NeuralNetwork(2, [4, 4, 1])
         self.x_accumulator = 0.0
 
     @classmethod
@@ -26,8 +25,6 @@ class NeuralNetPlayer:
     def from_other(cls, other):
         player = cls(other.paddle.surface.get_width() // 2, other.paddle.rect.y, other.ball, other.paddle.surface)
         player.network = NeuralNetwork.from_other_network(other.network)
-        player.network.print_network_debug()
-        other.network.print_network_debug()
         return player
 
     @classmethod
@@ -40,16 +37,16 @@ class NeuralNetPlayer:
         self.fitness_score += 3
 
     def get_fitness_score(self):
-        return self.fitness_score + self.score * 50
+        return self.fitness_score
 
     def mutate(self):
         self.network.mutate()
 
-    def play(self, debug):
+    def play(self):
         target_x = self.ball.x
         self_x = self.paddle.rect.x
 
-        outputs = self.network.feed_forward([self_x - target_x])
+        outputs = self.network.feed_forward([self_x, target_x])
 
         if self.x_accumulator > 1:
             self.x_accumulator = 1
@@ -64,9 +61,3 @@ class NeuralNetPlayer:
             self.paddle.move(1)
         else:
             self.paddle.move(self.x_accumulator)
-
-        if debug == True:
-            if self.last_output != outputs:
-                if self.paddle.rect.x < 100: print("      ", end="")
-                print(outputs)
-            self.last_output = outputs

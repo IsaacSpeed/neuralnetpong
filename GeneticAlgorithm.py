@@ -3,8 +3,8 @@ import random
 
 
 class GeneticAlgorithm:
-    chance_of_mutation = 0.00
-    chance_of_crossover = 0.0
+    chance_of_mutation = 0.1
+    chance_of_crossover = 0.7
     number_of_inputs_for_neural_network = 2
     neuron_layers = 1
 
@@ -36,10 +36,10 @@ class GeneticAlgorithm:
             mutation_chance = random.random()
             crossover_chance = random.random()
 
-            #if crossover_chance <= self.chance_of_crossover:
-            child = NeuralNetPlayer.crossover(first_individual, second_individual)
-            #else:
-            #child = NeuralNetPlayer.from_other(first_individual)
+            if crossover_chance <= self.chance_of_crossover:
+                child = NeuralNetPlayer.crossover(first_individual, second_individual)
+            else:
+                child = NeuralNetPlayer.from_other(first_individual)
 
             if mutation_chance <= self.chance_of_mutation:
                 child.mutate()

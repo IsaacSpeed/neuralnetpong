@@ -15,7 +15,7 @@ def main():
     players = []
     balls = []
 
-    genetic_algorithm = GeneticAlgorithm(50, 4)
+    genetic_algorithm = GeneticAlgorithm(50, 32)
 
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
@@ -25,7 +25,7 @@ def main():
     main_surface = main_surface.convert()
     main_surface.fill((0, 0, 0))
 
-    max_index = math.floor(math.sqrt(len(genetic_algorithm.population)))
+    max_index = math.floor(math.sqrt(len(genetic_algorithm.population)/2))
     for i in range(0, max_index):
         array_of_screens = []
         array_of_players = []
@@ -35,9 +35,8 @@ def main():
             pygame.draw.rect(surface, (150, 150, 150), Rect(0, 0, surface.get_width(), surface.get_height()), 1)
 
             ball = Ball(random.random() / 2, random.random() / 2, surface.get_width() // 25, surface)
-            top_player = DumbComputerPlayer(surface.get_width() // 2, 5, ball, surface)
 
-            player_index = i * max_index + j
+            player_index = (i * max_index + j) * 2
             bottom_player = genetic_algorithm.population[player_index]
             bottom_player.ball = ball
             bottom_player.paddle = Paddle(surface.get_width() // 2, surface.get_height() - 15,
@@ -45,6 +44,14 @@ def main():
                                           math.floor(surface.get_height() * 0.05), surface)
             bottom_player.x = surface.get_width() // 2
             bottom_player.y = surface.get_height() // 2
+
+            top_player = genetic_algorithm.population[player_index + 1]
+            top_player.ball = ball
+            top_player.paddle = Paddle(surface.get_width() // 2, 15,
+                                          math.floor(surface.get_width() * 0.2),
+                                          math.floor(surface.get_height() * 0.05), surface)
+            top_player.x = surface.get_width() // 2
+            top_player.y = surface.get_height() // 2
 
             array_of_screens.append(surface)
             array_of_balls.append(ball)
@@ -80,9 +87,8 @@ def main():
                     ball.undraw()
 
                     ball.respawn(random.random() / 2, random.random() / 2)
-                    top_player = DumbComputerPlayer(surface.get_width() // 2, 5, ball, surface)
 
-                    player_index = i * max_index + j
+                    player_index = (i * max_index + j) * 2
                     bottom_player = genetic_algorithm.population[player_index]
                     bottom_player.ball = ball
                     bottom_player.paddle = Paddle(random.randint(0, surface.get_width()), surface.get_height() - 15,
@@ -90,6 +96,14 @@ def main():
                                                   math.floor(surface.get_height() * 0.05), surface)
                     bottom_player.x = surface.get_width() // 2
                     bottom_player.y = surface.get_height() // 2
+
+                    top_player = genetic_algorithm.population[player_index + 1]
+                    top_player.ball = ball
+                    top_player.paddle = Paddle(surface.get_width() // 2, 15,
+                                               math.floor(surface.get_width() * 0.2),
+                                               math.floor(surface.get_height() * 0.05), surface)
+                    top_player.x = surface.get_width() // 2
+                    top_player.y = surface.get_height() // 2
 
                     bottom_player.score = 0
                     top_player.score = 0
@@ -119,18 +133,12 @@ def main():
                     ball.respawn(ball.vx * speed_multiplier, ball.vy * speed_multiplier * -1)
 
                 top_player.play()
-                bottom_player.play(False)
+                bottom_player.play()
 
                 main_surface.blit(surface, (surface.get_width() * j, surface.get_height() * i))
 
         screen.blit(main_surface, (0, 0))
         pygame.display.flip()
-
-        keys = pygame.key.get_pressed()
-        if keys[K_d]:
-            for array_of_players in players:
-                for player in array_of_players:
-                    player[1].network.print_network()
 
 
 if __name__ == '__main__':
