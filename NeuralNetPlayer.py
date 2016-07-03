@@ -13,8 +13,9 @@ class NeuralNetPlayer:
         self.ball = ball
         self.score = 0
         self.fitness_score = 1
-        self.network = NeuralNetwork(1, [3, 3, 2])
+        self.network = NeuralNetwork(1, [16, 1])
         self.last_output = []
+        self.x_accumulator = 0.0
 
     @classmethod
     def empty(cls):
@@ -23,18 +24,20 @@ class NeuralNetPlayer:
 
     @classmethod
     def from_other(cls, other):
-        player = cls(other.paddle.surface.get_width() // 2, other.y, other.ball, other.paddle.surface)
+        player = cls(other.paddle.surface.get_width() // 2, other.paddle.rect.y, other.ball, other.paddle.surface)
         player.network = NeuralNetwork.from_other_network(other.network)
+        player.network.print_network_debug()
+        other.network.print_network_debug()
         return player
 
     @classmethod
     def crossover(cls, first, second):
-        child = cls(first.paddle.surface.get_width() // 2, first.y, first.ball, first.paddle.surface)
+        child = cls(first.paddle.surface.get_width() // 2, first.paddle.rect.y, first.ball, first.paddle.surface)
         child.network = NeuralNetwork.crossover(first.network, second.network)
         return child
 
     def collide(self):
-        self.fitness_score += 10
+        self.fitness_score += 3
 
     def get_fitness_score(self):
         return self.fitness_score + self.score * 50
@@ -45,19 +48,22 @@ class NeuralNetPlayer:
     def play(self, debug):
         target_x = self.ball.x
         self_x = self.paddle.rect.x
+
         outputs = self.network.feed_forward([self_x - target_x])
-        movement = 0
 
-        # first output is should I move?
-        if outputs[0] == 1:
-            movement = -1
+        if self.x_accumulator > 1:
+            self.x_accumulator = 1
+        elif self.x_accumulator < -1:
+            self.x_accumulator = -1
 
-            # second is, which direction?
-            if outputs[1] == 1:
-                movement = 1
+        self.x_accumulator += outputs[0] * 3
 
-        self.paddle.move(movement)
-        self.network.mutate()
+        if self.paddle.rect.left > self.paddle.surface.get_width():
+            self.paddle.move(-1)
+        elif self.paddle.rect.right < 0:
+            self.paddle.move(1)
+        else:
+            self.paddle.move(self.x_accumulator)
 
         if debug == True:
             if self.last_output != outputs:

@@ -1,5 +1,6 @@
 import random
 import copy
+import math
 
 
 class NeuralNetwork:
@@ -40,6 +41,11 @@ class NeuralNetwork:
         network = cls(base_network.number_of_inputs, base_network.neuron_layers)
         network.inputs = []
         network.hidden_layers = copy.deepcopy(base_network.hidden_layers)
+
+        # set the inputs for the neurons in the network
+        for neuron in network.hidden_layers[0]:
+            neuron.inputs = network.inputs
+
         return network
 
     @classmethod
@@ -51,8 +57,14 @@ class NeuralNetwork:
 
         for i in range(layer_index, len(child.hidden_layers)):
             for j in range(neuron_index, len(child.hidden_layers[i])):
-                child.hidden_layers[i][j] = copy.deepcopy(second_network.hidden_layers[i][j])
+                child.hidden_layers[i][j].weights = copy.deepcopy(second_network.hidden_layers[i][j].weights)
+                child.hidden_layers[i][j].threshold = second_network.hidden_layers[i][j].threshold
             neuron_index = 0
+
+        # set the inputs for the neurons in the network
+        for neuron in child.hidden_layers[0]:
+            neuron.inputs = child.inputs
+
         return child
 
     def feed_forward(self, inputs):
@@ -74,7 +86,18 @@ class NeuralNetwork:
                 if chance <= self.chance_of_mutation:
                     neuron.mutate()
 
+    def print_network_debug(self):
+        print("Inputs:")
+        for an_input in self.inputs:
+            print(an_input.get_output())
+
+        self.hidden_layers[0][0].print_neuron()
+
     def print_network(self):
+        print("Inputs: ")
+        for an_input in self.inputs:
+            print(an_input.get_output())
+
         for i, layer in enumerate(self.hidden_layers):
             print("Layer number {}".format(i + 1))
             for neuron in layer:
@@ -96,10 +119,12 @@ class Neuron:
         for input, weight in zip(self.inputs, self.weights):
             input_sum += input.get_output() * weight
 
-        if input_sum > self.threshold:
-            return 1
-        else:
-            return 0
+        try:
+            denominator = 1 + math.exp(-5*input_sum)
+        except OverflowError:
+            denominator = float("inf")
+        result = 1/denominator - 0.5
+        return result
 
     def mutate(self):
         i = random.randint(0, len(self.weights) - 1)

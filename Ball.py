@@ -20,8 +20,8 @@ class Ball:
         if other.paddle.rect.left - self.radius < self.x < other.paddle.rect.right + self.radius and\
                 other.paddle.rect.top - self.radius < self.y + self.vy < other.paddle.rect.bottom + self.radius:
             other.collide()
-            if self.y > other.paddle.rect.top > 50:
-                self.vx *= -1
+            if self.y > 50:
+                self.y -= 10
             return True
         else:
             return False

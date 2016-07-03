@@ -2,7 +2,6 @@ import pygame
 from pygame.locals import *
 from Ball import Ball
 from DumbComputerPlayer import DumbComputerPlayer
-from NeuralNetPlayer import NeuralNetPlayer
 from GeneticAlgorithm import GeneticAlgorithm
 from Paddle import Paddle
 import math
@@ -16,7 +15,7 @@ def main():
     players = []
     balls = []
 
-    genetic_algorithm = GeneticAlgorithm(50, 16)
+    genetic_algorithm = GeneticAlgorithm(50, 4)
 
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
@@ -35,7 +34,7 @@ def main():
             surface = pygame.Surface((main_surface.get_width() // max_index, main_surface.get_height() // max_index))
             pygame.draw.rect(surface, (150, 150, 150), Rect(0, 0, surface.get_width(), surface.get_height()), 1)
 
-            ball = Ball(random.random() / 2, random.random() / 2, 5, surface)
+            ball = Ball(random.random() / 2, random.random() / 2, surface.get_width() // 25, surface)
             top_player = DumbComputerPlayer(surface.get_width() // 2, 5, ball, surface)
 
             player_index = i * max_index + j
@@ -66,7 +65,7 @@ def main():
                 return
 
         current_time = time.clock()
-        if current_time - start_time > 3:
+        if current_time - start_time > 10:
             should_continue = genetic_algorithm.next_generation()
 
             print("Respawning! Now generation {:}".format(genetic_algorithm.generation_counter))
@@ -126,6 +125,12 @@ def main():
 
         screen.blit(main_surface, (0, 0))
         pygame.display.flip()
+
+        keys = pygame.key.get_pressed()
+        if keys[K_d]:
+            for array_of_players in players:
+                for player in array_of_players:
+                    player[1].network.print_network()
 
 
 if __name__ == '__main__':
